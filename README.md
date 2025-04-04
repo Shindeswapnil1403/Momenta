@@ -43,6 +43,7 @@ Utilising pretrained weights: utilising some of the pretrained RawNet2 models tr
 Pipeline extensions: Add some post-processing, confidence thresholds, and noise robustness.
 
 3. Reflection Questions
+
 1. What were the most significant challenges in implementing this model?
 Lack of access to labeled, real-world spoofed audio limited training and evaluation. Simplifying RawNet2 while maintaining key features required careful balancing.
 2. How might this approach perform in real-world conditions vs. research datasets?
