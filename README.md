@@ -1,142 +1,137 @@
-RawNet2 Audio Deepfake Detection
-Detect AI-generated (spoofed) human speech using a lightweight version of the RawNet2 model. This repository explores deepfake audio detection by directly processing raw waveforms and analyzing temporal speech patterns using a simplified RawNet2 architecture.
 
-📌 Project Overview
-This repository implements a simplified RawNet2 model to detect bonafide vs. spoofed audio from raw waveform inputs. It simulates a realistic audio deepfake detection pipeline using dummy data, with the option to plug in real datasets like ASVspoof 2019 LA.
+---
+# RawNet2 Audio Deepfake Detection
 
-🔍 Research & Approach Selection
-After examining the Audio Deepfake Detection GitHub repository, we selected RawNet2 as our primary architecture. Here's a summary of the research evaluation:
+This repository presents a lightweight implementation of RawNet2, a deep learning model for detecting audio deepfakes using raw waveform data. It demonstrates a simplified pipeline with dummy data and lays the groundwork for future enhancements using real-world datasets and architectures.
 
-✅ Approach 1: RawNet2 (ICASSP 2020)
-End-to-end DNN processing raw audio with residual CNN + GRU.
+---
 
-EER ~1.08% on ASVspoof 2019 — high performance.
+## 🔍 Research & Model Selection
 
-GRU captures long-term dependencies across speech sequences.
+After reviewing deepfake detection techniques, we shortlisted three viable approaches:
 
-Tradeoffs: Needs strong GPU support; sensitive to raw audio noise.
+### **1. RawNet2 (ICASSP 2020)**
 
-🧠 Approach 2: LFCC / CQCC + GMM (Traditional)
-Classical ML using cepstral features + Gaussian modeling.
+- End-to-end deep neural network that operates directly on raw waveforms  
+- Combines residual Conv1D blocks with GRU layers for temporal modeling  
+- Achieved **EER of ~1.08%** on ASVspoof 2019 dataset  
+- Avoids handcrafted features for better generalization  
+- **Limitations:**
+  - Requires high GPU memory for training  
+  - Sensitive to noise in real-world environments
 
-EER ~17.55% — lighter but less accurate.
+### **2. LFCC/CQCC + GMM**
 
-Advantages: Easy deployment on embedded systems.
+- Uses cepstral coefficients (LFCC or CQCC) as handcrafted features  
+- Gaussian Mixture Models (GMM) used for classification  
+- Lightweight and suitable for real-time/embedded systems  
+- **EER ~17.55%** with LFCC-GMM baseline  
+- **Limitations:**
+  - Poor generalization to unseen spoofing methods  
+  - Not as accurate as deep models
 
-Drawbacks: Weak generalization to new spoof types.
+### **3. AASIST (INTERSPEECH 2022)**
 
-🛡️ Approach 3: AASIST (INTERSPEECH 2022)
-Multi-stream architecture with Res2Net + attention.
+- Multi-stream architecture using:
+  - 2D CNNs (Res2Net)
+  - 1D temporal attention
+  - Spectro-temporal features  
+- Achieved **state-of-the-art EER ~0.63%** on ASVspoof 2019  
+- Robust in noisy, real-world conditions  
+- **Limitations:**
+  - Computationally intensive  
+  - Requires optimization for deployment
 
-State-of-the-art: EER as low as 0.63%.
+---
 
-Highly modular and robust in noisy settings.
+## ⚙️ Implementation Process
 
-Tradeoffs: Large model, may require pruning for deployment.
+### **Challenges Faced**
 
-⚙️ Implementation Details
-Model Architecture
-We implemented a lightweight RawNet2-style model using:
+- Lack of real audio deepfake data  
+- GRU training instability with synthetic data  
+- Model overfitting due to small dummy dataset
 
-Conv1D layers to extract local acoustic patterns.
+### **How We Addressed Them**
 
-GRU layer to model sequential speech dynamics.
+- Simulated a binary classification task using alternating labels  
+- Reduced model size (RawNet2Lite) to improve training stability  
+- Assumed:
+  - Audio clips were 1-second @ 16kHz  
+  - Balanced dataset (bonafide vs. spoof)  
+  - Focused on demonstrating feasibility, not real-world performance
 
-FC + Sigmoid layer for binary classification (spoof/bonafide).
+---
 
-Dataset
-A dummy dataset was created using random waveforms (simulating audio inputs).
+## 📈 Analysis
 
-Labels alternate between bonafide (0) and spoof (1).
+### **Why RawNet2**
 
-Sample rate: 16kHz, 1-second audio clips.
+- Processes raw waveforms directly (no feature engineering required)  
+- Performs well in public benchmarks like ASVspoof  
+- GRU effectively captures long-term speech patterns
 
-🛠️ Training & Evaluation
-Loss: Binary Cross-Entropy (BCE)
+### **Model Workflow**
 
-Optimizer: Adam (LR = 0.001)
+- **Input:** 1D raw audio waveform  
+- **Conv1D layers:** Extract low-level acoustic features  
+- **GRU layer:** Captures temporal dependencies  
+- **FC + Sigmoid:** Outputs binary classification (bonafide/spoof)
 
-Epochs: 5
+### **Performance (Dummy Dataset)**
 
-Evaluation: Accuracy + classification_report from sklearn
+- Accuracy: ~60–70% (depending on randomness)  
+- Confirms the functional pipeline, not real-world readiness
 
-Note: Since dummy data is used, performance varies randomly and does not reflect real-world model accuracy.
+### **Strengths**
 
-📊 Documentation & Analysis
-1. Implementation Process
-🚧 Challenges
-No real audio deepfake data in early phases.
+- Modular and extendable architecture  
+- Ideal for experimenting with raw audio-based deepfake detection  
 
-GRU training instability with dummy input lacking temporal meaning.
+### **Weaknesses**
 
-🔄 Solutions
-Dummy dataset created with binary alternating labels.
+- Dummy data lacks variability and realism  
+- GRU struggles with noise or longer sequences without attention  
 
-Simplified RawNet2Lite version to reduce model size and overfitting risk.
+---
 
-🧠 Assumptions
-Audio clips are 1s long, sampled at 16kHz.
+## 🚀 Suggestions for Improvement
 
-Balanced dataset between spoof and bonafide.
+- Use real datasets (e.g., ASVspoof 2019 LA, WaveFake, TIMIT)  
+- Add noise robustness and domain adaptation techniques  
+- Explore LSTM + attention or Transformer-based architectures  
+- Integrate pretrained RawNet2 models  
+- Extend pipeline with:
+  - Confidence scoring  
+  - Post-processing  
+  - Voice activity detection (VAD)
 
-Prototype is for demonstrating the feasibility of end-to-end processing.
+---
 
-2. Model Analysis
-🔎 Why RawNet2?
-End-to-end processing of raw audio without handcrafted features.
+## 🧠 Reflection
 
-Good benchmark results on public ASVspoof datasets.
+### **Key Challenges**
 
-GRU enables sequential understanding of audio patterns.
+- Limited access to real labeled audio  
+- Simplifying RawNet2 without losing core benefits
 
-🧬 Model Workflow
-mathematica
-Copy
-Edit
-Input (1D waveform) → Conv1D Layers → GRU → FC → Sigmoid → Prediction
-📈 Performance (on dummy data)
-Accuracy fluctuates between 60–70% depending on randomness.
+### **Real-World Considerations**
 
-Functional pipeline confirmed, not for performance benchmarking.
+- Real data introduces compression artifacts, accents, and background noise  
+- Clean training datasets may not generalize well without augmentation
 
-3. Strengths & Weaknesses
-✅ Strengths
-Fully modular & extendable.
+### **Additional Data/Resources Needed**
 
-Ideal for prototyping raw audio input pipelines.
+- Labeled spoofed speech from various synthesis methods  
+- Augmented data covering diverse speaking styles and noise levels  
+- More compute to support deeper RawNet2 versions
 
-Ready for integration with APIs (e.g., FastAPI, Flask).
+### **Production Deployment Plan**
 
-❌ Weaknesses
-Dummy data lacks real-world variability.
+- **Model Serving:** TorchScript or ONNX for optimized inference  
+- **API Integration:** Use FastAPI or Flask for audio uploads and predictions  
+- **Preprocessing:** Normalize input audio and apply VAD  
+- **Monitoring:** Log confidence scores and route low-confidence predictions to human reviewers  
 
-GRU may struggle with long or noisy audio sequences.
+---
 
-💡 Future Improvements
-Integrate real datasets: ASVspoof 2019 LA, WaveFake, TIMIT.
-
-Upgrade to LSTM + attention or Transformers for better modeling.
-
-Use pretrained RawNet2 weights for improved performance.
-
-Add features: post-processing, confidence thresholds, and UI/REST APIs.
-
-🔄 Reflection Questions
-Most significant challenge?
-Lack of real, labeled spoof audio and balancing simplicity vs. fidelity in RawNet2Lite.
-
-Real-world performance?
-Likely lower due to noise, accents, compression — domain adaptation would help.
-
-What would improve it?
-Real-world spoofed datasets, more training compute, augmentation techniques.
-
-How to deploy?
-
-TorchScript/ONNX for optimized inference
-
-FastAPI/Flask for serving
-
-Preprocessing with VAD & normalization
-
-Monitoring with human-in-the-loop for edge cases
